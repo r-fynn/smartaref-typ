@@ -230,20 +230,20 @@
 			target.label,
 			text,
 		)
-	    items.push((nums, short-ref))
-	  }
-	
-	  // Optionally sort by numbering tuple.
+		items.push((nums, short-ref))
+	}
+
+	// Optionally sort by numbering tuple.
 	if sort {
-	    items = items.sorted(key: it => it.at(0))
-	  }
+		items = items.sorted(key: it => it.at(0))
+	}
 	
 	let short-refs = ()
 	let all-nums = ()
 	for item in items {
-	    all-nums.push(item.at(0))
-	    short-refs.push(item.at(1))
-	  }
+		all-nums.push(item.at(0))
+		short-refs.push(item.at(1))
+	}
 
 	if compact {
 		// compact consecutive references (e.g. "figs. 1, 2, 3 and 4" becomes
