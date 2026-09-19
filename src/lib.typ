@@ -86,6 +86,10 @@
 // b-nums, comparing numbering components from left to right (e.g. `(3, 1, 2)`
 // sorts before `(3, 2, 1)`). A numbering which is a prefix of another sorts
 // before it (e.g. `(3, 1)` sorts before `(3, 1, 2)`).
+//
+// The compared numberings are counter values, which are integers regardless of
+// the numbering pattern used to render them. Alphabetic ("A", "B", "C") and
+// roman ("i", "ii", "iii") numbering therefore sort as decimal numbering does.
 #let nums-lt(a-nums, b-nums) = {
 	let n = calc.min(a-nums.len(), b-nums.len())
 	for i in range(0, n) {
@@ -203,6 +207,10 @@
 	compact-func: compact-func,
 	// Whether to sort references by their numbering before compacting and
 	// joining them (e.g. "figs. 3, 1 and 2" becomes "figs. 1, 2 and 3").
+	//
+	// References are sorted by counter value. Two references may thus share a
+	// numbering if their counter was reset in between (e.g. section 1 and
+	// appendix A), in which case they keep the order they were given in.
 	sort: false,
 	// A function used to sort references by their numbering.
 	sort-func: sort-func,

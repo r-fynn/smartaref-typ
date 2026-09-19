@@ -98,3 +98,54 @@ $ abs(z) = sqrt(x^2 + y^2) $ <eq-pythagoras>
 $ e^(i pi) = -1 $ <eq-eulers-identity>
 
 $ (cos x + i sin x)^n = cos(n x) + i sin(n x) $ <eq-de-moivres-formula>
+
+// === [ appendices example ] ==================================================
+
+= Appendices example
+
+// Sorting compares the counter values of the referenced elements, which are
+// integers whatever numbering pattern renders them. Alphabetic and roman
+// numbering therefore sort in the same order as decimal numbering.
+
+`ref`: See @app-two, @app-one-c, @app-one and @app-one-b.
+
+#emph[`sort: false`] \
+`cref`: See #cref(sort: false)[@app-two @app-one-c @app-one @app-one-b].
+
+#emph[`sort: true`] \
+`cref`: See #cref[@app-two @app-one-c @app-one @app-one-b].
+
+#emph[`sort: true, compact: true`] \
+`cref`: See #cref(compact: true)[@app-one-c @app-one-a @app-one-b].
+
+// NOTE: counters restart at the appendices, so appendix A and section 1 share
+// the numbering `(1,)`. References spanning such a counter reset interleave, as
+// the sort has nothing but the counter values to go by.
+#emph[`sort: true`, references spanning a counter reset] \
+`cref`: See #cref[@app-one-a @sec-subsection-one @app-two @sec-sections-example].
+
+#counter(heading).update(0)
+#set heading(numbering: "A.i")
+
+= Appendix one
+<app-one>
+
+== Appendix subsection a
+<app-one-a>
+
+#lorem(10)
+
+== Appendix subsection b
+<app-one-b>
+
+#lorem(10)
+
+== Appendix subsection c
+<app-one-c>
+
+#lorem(10)
+
+= Appendix two
+<app-two>
+
+#lorem(15)
