@@ -82,6 +82,43 @@
 	}
 }
 
+// nums-lt reports whether the numbering a-nums sorts before the numbering
+// b-nums, comparing numbering components from left to right (e.g. `(3, 1, 2)`
+// sorts before `(3, 2, 1)`). A numbering which is a prefix of another sorts
+// before it (e.g. `(3, 1)` sorts before `(3, 1, 2)`).
+#let nums-lt(a-nums, b-nums) = {
+	let n = calc.min(a-nums.len(), b-nums.len())
+	for i in range(0, n) {
+		let a = a-nums.at(i)
+		let b = b-nums.at(i)
+		if a != b {
+			return a < b
+		}
+	}
+	return a-nums.len() < b-nums.len()
+}
+
+// sort-func returns the given (numbering, short reference) pairs sorted by
+// numbering. References with equal numbering keep their relative order.
+#let sort-func(
+	// An array of (numbering, short reference) pairs.
+	items,
+	// A function reporting whether one numbering sorts before another.
+	lt: nums-lt,
+) = {
+	// Insertion sort, as Typst arrays cannot be compared by `sorted(key: ..)`.
+	// The number of references of a single `cref` is small.
+	let sorted-items = ()
+	for item in items {
+		let i = sorted-items.len()
+		while i > 0 and lt(item.at(0), sorted-items.at(i - 1).at(0)) {
+			i = i - 1
+		}
+		sorted-items.insert(i, item)
+	}
+	return sorted-items
+}
+
 // is-consecutive reports whether the given numberings follow one another in
 // consecutive order (e.g. `(3, 1, 2)` is followed by `(3, 1, 3)`).
 #let is-consecutive(a-nums, b-nums) = {
@@ -164,6 +201,11 @@
 	compact: false,
 	// A function used to compact consecutive references.
 	compact-func: compact-func,
+	// Whether to sort references by their numbering before compacting and
+	// joining them (e.g. "figs. 3, 1 and 2" becomes "figs. 1, 2 and 3").
+	sort: false,
+	// A function used to sort references by their numbering.
+	sort-func: sort-func,
 	// A supplement used for the list of references.
 	//
 	// Takes one of the following values:
@@ -205,8 +247,7 @@
 		let target = query(ref.target).first()
 		targets.push(target)
 	}
-	let short-refs = () // short references (e.g. "1" instead of "Figure 1")
-	let all-nums = ()   // array of counter numberings.
+	let items = () // (counter numbering, short reference) pairs
 	for target in targets {
 		let elem = target
 		let c = none
@@ -228,9 +269,13 @@
 			target.label,
 			text,
 		)
-		short-refs.push(short-ref)
-		all-nums.push(nums)
+		items.push((nums, short-ref))
 	}
+	if sort {
+		items = sort-func(items)
+	}
+	let all-nums = items.map(item => item.at(0))   // counter numberings
+	let short-refs = items.map(item => item.at(1)) // short references (e.g. "1" instead of "Figure 1")
 	if compact {
 		// compact consecutive references (e.g. "figs. 1, 2, 3 and 4" becomes
 		// "figs. 1 to 4").

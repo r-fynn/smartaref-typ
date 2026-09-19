@@ -26,6 +26,12 @@ See [example/example-compact.typ](example/example-compact.typ).
 
 ![Compact consecutive references example](example/example-compact.png)
 
+## Sort references in numerical order
+
+See [example/example-sort.typ](example/example-sort.typ).
+
+![Sort references in numerical order example](example/example-sort.png)
+
 ## Subpar example
 
 See [example/example-subpar.typ](example/example-subpar.typ).
