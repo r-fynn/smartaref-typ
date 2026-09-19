@@ -82,43 +82,31 @@
 	}
 }
 
-// nums-lt reports whether the numbering a-nums sorts before the numbering
-// b-nums, comparing numbering components from left to right (e.g. `(3, 1, 2)`
-// sorts before `(3, 2, 1)`). A numbering which is a prefix of another sorts
-// before it (e.g. `(3, 1)` sorts before `(3, 1, 2)`).
+// sort-func returns the given (numbering, short reference, label) triples
+// sorted by numbering, with duplicate references removed.
 //
-// The compared numberings are counter values, which are integers regardless of
-// the numbering pattern used to render them. Alphabetic ("A", "B", "C") and
-// roman ("i", "ii", "iii") numbering therefore sort as decimal numbering does.
-#let nums-lt(a-nums, b-nums) = {
-	let n = calc.min(a-nums.len(), b-nums.len())
-	for i in range(0, n) {
-		let a = a-nums.at(i)
-		let b = b-nums.at(i)
-		if a != b {
-			return a < b
-		}
-	}
-	return a-nums.len() < b-nums.len()
-}
-
-// sort-func returns the given (numbering, short reference) pairs sorted by
-// numbering. References with equal numbering keep their relative order.
+// The numberings are counter values, which are arrays of integers regardless of
+// the numbering pattern used to render them. Typst orders such arrays element
+// by element (e.g. `(2,)` sorts before `(2, 1)`, which sorts before `(3,)`), so
+// alphabetic ("A", "B", "C") and roman ("i", "ii", "iii") numbering sort in the
+// same order as decimal numbering.
+//
+// Note that two references may share a numbering if their counter was reset in
+// between (e.g. section 1 and appendix A). Such references are kept, in the
+// order they were given in, as only their labels tell them apart.
 #let sort-func(
-	// An array of (numbering, short reference) pairs.
+	// An array of (numbering, short reference, label) triples.
 	items,
-	// A function reporting whether one numbering sorts before another.
-	lt: nums-lt,
 ) = {
-	// Insertion sort, as Typst arrays cannot be compared by `sorted(key: ..)`.
-	// The number of references of a single `cref` is small.
 	let sorted-items = ()
-	for item in items {
-		let i = sorted-items.len()
-		while i > 0 and lt(item.at(0), sorted-items.at(i - 1).at(0)) {
-			i = i - 1
+	let seen-labels = ()
+	for item in items.sorted(key: item => item.at(0)) {
+		let label = item.at(2)
+		if label in seen-labels {
+			continue // skip duplicate reference
 		}
-		sorted-items.insert(i, item)
+		seen-labels.push(label)
+		sorted-items.push(item)
 	}
 	return sorted-items
 }
@@ -207,10 +195,8 @@
 	compact-func: compact-func,
 	// Whether to sort references by their numbering before compacting and
 	// joining them (e.g. "figs. 3, 1 and 2" becomes "figs. 1, 2 and 3").
-	//
-	// References are sorted by counter value. Two references may thus share a
-	// numbering if their counter was reset in between (e.g. section 1 and
-	// appendix A), in which case they keep the order they were given in.
+	// Duplicate references are removed when sorting, as sorting groups them
+	// together (e.g. "figs. 1 to 3 and 3" becomes "figs. 1 to 3").
 	sort: false,
 	// A function used to sort references by their numbering.
 	sort-func: sort-func,
@@ -255,7 +241,7 @@
 		let target = query(ref.target).first()
 		targets.push(target)
 	}
-	let items = () // (counter numbering, short reference) pairs
+	let items = () // (counter numbering, short reference, label) triples
 	for target in targets {
 		let elem = target
 		let c = none
@@ -277,7 +263,7 @@
 			target.label,
 			text,
 		)
-		items.push((nums, short-ref))
+		items.push((nums, short-ref, target.label))
 	}
 	if sort {
 		items = sort-func(items)

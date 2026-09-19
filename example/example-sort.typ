@@ -29,6 +29,10 @@
 #emph[`sort: true, compact: true`] \
 `cref`: See #cref(compact: true)[@fig-qux @fig-foo @fig-baz @fig-bar].
 
+// NOTE: sorting groups duplicate references together, so it removes them.
+#emph[`sort: true`, duplicate references] \
+`cref`: See #cref[@fig-qux @fig-foo @fig-qux].
+
 #grid(
 	columns: 4,
 	gutter: 1.5em,
@@ -120,7 +124,8 @@ $ (cos x + i sin x)^n = cos(n x) + i sin(n x) $ <eq-de-moivres-formula>
 
 // NOTE: counters restart at the appendices, so appendix A and section 1 share
 // the numbering `(1,)`. References spanning such a counter reset interleave, as
-// the sort has nothing but the counter values to go by.
+// the sort has nothing but the counter values to go by. References sharing a
+// numbering this way are kept; only duplicates of the same element are removed.
 #emph[`sort: true`, references spanning a counter reset] \
 `cref`: See #cref[@app-one-a @sec-subsection-one @app-two @sec-sections-example].
 

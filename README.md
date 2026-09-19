@@ -29,7 +29,8 @@ See [example/example-compact.typ](example/example-compact.typ).
 ## Sort references in numerical order
 
 References are sorted by counter value, so alphabetic ("A", "B", "C") and roman
-("i", "ii", "iii") numbering sort in the same order as decimal numbering.
+("i", "ii", "iii") numbering sort in the same order as decimal numbering. Sorting
+groups duplicate references together, and therefore removes them.
 
 See [example/example-sort.typ](example/example-sort.typ).
 
